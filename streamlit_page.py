@@ -1,8 +1,8 @@
-# -*- coding: utf-8 -*-
+# -- coding: utf-8 --
 """
 Created on Sun Feb 27 21:54:23 2022
 
-@author: torque
+@author: tomas boncompte
 """
 
 import pandas as pd
@@ -11,11 +11,14 @@ import streamlit as st
 import numpy as np
 import plotly.graph_objects as go
 import plotly.express as px
+import re
+import random
 
 st.set_page_config()
-
+base="light"
 
 inits=pd.read_pickle('df_inits.pkl')
+inits2=inits
 words=pd.read_pickle('word_ratings.pkl')
 words2=words[['word','ratio']]
 def recode(input):
@@ -24,9 +27,8 @@ def recode(input):
 words2.ratio=words2.ratio.apply(recode).copy(deep=True)
 
 st.title('Iniciativas Populares de Norma en la Constituyente')
-st.subheader('Un Análisis Cuantitativo')
 
-st.write('He analizado el texto de 2444 de las iniciativas populares de norma\npropuestas por los chilenos durante (fechas). \nel único criterio de inclusión fué que la iniciativa tuviera más de 10 apoyos.\nno se incluyen los párrafos asociados a la propuesta de articulado ni\nlos que describen al grupo que propone la idea')
+st.write('Este análisis incluye 2444 de las iniciativas populares de norma\npropuestas por los chilenos durante enero de 2022. \nel único criterio de inclusión fué que la iniciativa tuviera más de 10 apoyos.')
 
 buto = st.button('Explicación') 
              
@@ -36,7 +38,7 @@ if buto:
               los chilenos, o al menos de los chilenos que escribieron propuestas de iniciativa popular de norma:
               La pregunta (o más bien, una pregunta que uno puede hacerse y que parece interesante) es: 
               ¿qué están pensando las personas que se dieron el trabajo de subir una iniciativa popular
-              de norma? para respondernos a esto, utilizamos Python para contar cuántas veces aparece cada palabra en 
+              de norma? para respondernos a esto contamos cuántas veces aparece cada palabra en 
               las iniciativas populares. Naturalmente, las palabras más comúnes son siempre más o menos las mismas 
               en cualquier idioma: en el caso del castellano, estas son palabras como "de", "con", "el", "la", "los", "las", etcétera.  ''')
               
@@ -45,7 +47,7 @@ if buto:
               la frecuencia que esa palabra en particular suele tener en el idioma castellano: a esto le llamaremos
               el Puntaje de la palabra y la hemos calculado como la razón entre la frecuencia (en partes por millón) de
               una cierta palabra en el texto de las iniciativas y la frecuencia que esta suele tener en el idioma. un 
-              puntaje de 10, por ejemplo, significa que la palabra aparece *diez veces más* en las iniciativas que 
+              puntaje de 10, por ejemplo, significa que la palabra aparece diez veces más en las iniciativas que 
               en un texto castellano cualquiera. Abajo tenemos las palabras que tienen ese puntaje o más''')
               
      st.write('''Esto es una forma sistemática de hacer algo que las personas hacemos todos los días de manera natural, 
@@ -87,11 +89,93 @@ fig.update_layout(
 
 st.plotly_chart(fig, use_container_width=True)
 
+a = words2["word"]
+
+option = st.selectbox(
+     'explorar palabra:',
+    a)
+
+inits = inits.sort_values(by='F_{}'.format(option), ascending=False)
+contain_values = inits[inits['cuerpo'].str.contains(option)]
+
+nombres=contain_values['nombre']
+rat = words2.loc[words2['word']==option,'ratio'].iloc[0]
+print('$$$$$$$$$')
+print(rat)
 
 
+st.write('es {} veces más frecuente de lo normal en las iniciativas'.format(rat))
 
-#fig.show()
-#words=words.reindex(list)
-#print(words['word'])
-#print(words.loc[519])
-#print(words)
+a=inits2.sort_values(by='F_{}'.format(option))
+
+#  construye la muestra random de frases
+
+todas_frases = []
+for index, each in inits.iterrows():
+    text=each[1]
+    splitted = re.split("[.,:;?()]",text)
+    for phrase in splitted:
+        todas_frases.append(phrase)
+        
+print(len(todas_frases))
+print(todas_frases[12])
+
+frases=[]
+for each in todas_frases:
+    if option in each and 'Breve reseña sobre quién o quiénes proponen y la historia de la elaboración de la iniciativa' not in each and len(each.split(' ')) > 7 and each.split(' ')[-1] != 'que' and 'Situación Ideal' not in each:
+        frases.append(each)
+
+buto_muestra = st.button('ver una muestra del uso de la palabra') 
+if buto_muestra:
+    sample=random.sample(frases, 3)
+    st.markdown("""
+<style>
+.smol {
+    font-size:12px !important;
+    text-align: right;
+}
+</style>
+""", unsafe_allow_html=True)
+    for each in sample:
+        k='{}{}{}'.format('<b>',option,'</b>')
+        write=each.replace(option,k)
+        for index, init in inits.iterrows():
+            if each in init['cuerpo']:
+                nombre=init['nombre']
+                link=init['links']
+        iqtlf = nombre
+        linku= '<a href="'+link+'">[ver en contexto]</a>'
+        linea =  '<p class="smol">'+write+' '+linku+'</p> '
+        
+        st.markdown(linea, unsafe_allow_html=True)
+    
+st.write('y aparece en {} iniciativas diferentes'.format(len(contain_values)))
+option2 = st.selectbox(
+     'iniciativa:',
+    nombres)
+
+
+cor = ''
+for index, each in a.iterrows():
+    if option2 in each[0]:
+        cor=each[1]
+
+k='{}{}{}'.format('<mark class="red">**',option,'**</mark>')
+print(k)
+
+times = cor.count(option)
+st.write('{} aparece {} veces en la iniciativa seleccionada'.format(option, times))
+
+buto2 = st.button('Ver') 
+if buto2:
+    st.markdown(cor.replace(option,k),unsafe_allow_html=True)
+
+#%%
+
+for index, init in inits.iterrows():
+    if 'Conocemos de cerca' in init['cuerpo']:
+        nombre=init['nombre']
+        print(nombre)
+        link=init['links']
+        print(link)
+        
