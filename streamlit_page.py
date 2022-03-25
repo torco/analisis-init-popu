@@ -215,19 +215,19 @@ if buto2:
 #%% this is just debug
 
 
-newcor=''
-allowable = [' ','a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'á', 'é', 'í', 'ó', 'ú', 'ñ', 'Ñ', '0', '1', '2','3','4','5','6','7','8','9','.',',',':',';','?','!','(',')','-']
-for char in cor[:]:
-    if char in allowable:
-        newcor=newcor+char
-        print(newcor)
+#newcor=''
+#allowable = [' ','a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'á', 'é', 'í', 'ó', 'ú', 'ñ', 'Ñ', '0', '1', '2','3','4','5','6','7','8','9','.',',',':',';','?','!','(',')','-']
+#for char in cor[:]:
+#    if char in allowable:
+#        newcor=newcor+char
+#        print(newcor)
         
 
 #%%
 
-emptylist=[]
-for index, each in inits2.iterrows():
-    text=each['cuerpo']
-    if 'terceros para poder trabajar y tener' in text:
-        emptylist.append(text)
+#emptylist=[]
+#for index, each in inits2.iterrows():
+#    text=each['cuerpo']
+#    if 'terceros para poder trabajar y tener' in text:
+#        emptylist.append(text)
         
